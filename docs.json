@@ -1,122 +1,93 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
-  "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
-  },
-  "favicon": "/favicon.svg",
-  "navigation": {
-    "tabs": [
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
+  "name": "Milele",
   "logo": {
+    "dark": "/logo/dark.svg",
     "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "href": "https://milele.co.ke"
+  },
+  "favicon": "/logo/favicon.svg",
+  "theme": "mint",
+  "colors": {
+    "primary": "#D03030",
+    "light": "#FFC1AC",
+    "dark": "#BA1833"
   },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Dashboard",
+        "href": "https://milele.co.ke/dashboard"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Get API Keys",
+      "href": "https://milele.co.ke/dashboard/settings"
     }
   },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "quickstart",
+          "prerequisites/authorization",
+          "prerequisites/idempotency",
+          "prerequisites/rate-limiting",
+          "prerequisites/versioning",
+          "webhooks",
+          "status"
+        ]
+      },
+      {
+        "group": "Core",
+        "pages": [
+          "core/balance",
+          "core/status"
+        ]
+      },
+      {
+        "group": "Payments",
+        "pages": [
+          "payments/accept",
+          "payments/payouts",
+          "payments/payouts-status",
+          "payments/identity"
+        ]
+      },
+      {
+        "group": "Messaging",
+        "pages": [
+          "sms"
+        ]
+      },
+      {
+        "group": "Airtime",
+        "pages": [
+          "airtime/order",
+          "airtime/status"
+        ]
+      },
+      {
+        "group": "Bills",
+        "pages": [
+          "bills/bill",
+          "bills/order",
+          "bills/status"
+        ]
+      }
+    ],
+    "pages": []
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "website": "https://milele.co.ke",
+      "x": "https://x.com/mileleairtime",
+      "linkedin": "https://www.linkedin.com/company/mileleairtime"
     }
+  },
+  "feedback": {
+    "thumbsRating": true
   }
 }

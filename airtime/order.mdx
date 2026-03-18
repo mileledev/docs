@@ -1,0 +1,112 @@
+---
+title: "Send airtime"
+description: "Top up a mobile number with airtime."
+---
+
+Checks that your account has sufficient balance, then places an order. A [webhook](/webhooks) delivers the final status; you can also [retrieve the airtime order](/airtime/status).
+
+**POST** `/v1/airtime`
+
+---
+
+## Services
+
+Pass the service name in the `service` field. If omitted, the service is auto-detected from the `account` number prefix.
+
+| Service | Description |
+|---------|-------------|
+| `safaricom` | Safaricom |
+| `airtel` | Airtel |
+| `telkom` | Telkom Kenya |
+| `jtl` | JTL |
+| `equitel` | Equitel |
+
+---
+
+## Request
+
+<RequestExample>
+```bash cURL
+curl -X POST https://api.milele.co.ke/v1/airtime \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer {token}' \
+  -d '{
+    "service":       "safaricom",
+    "account":       "0733000000",
+    "amount":        10,
+    "currency":      "KES",
+    "reference":     "ref1234",
+    "idempotencyKey": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    "name":          "John",
+    "phone":         "254722000000",
+    "shortcode":     "100100"
+  }'
+```
+</RequestExample>
+
+<ParamField body="service" type="string">
+  Airtime service identifier — see [Services](#services) above. Auto-detected if omitted.
+</ParamField>
+
+<ParamField body="account" type="string" required>
+  Recipient phone number.
+</ParamField>
+
+<ParamField body="amount" type="number" required>
+  Amount to top up.
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  Currency code.
+</ParamField>
+
+<ParamField body="reference" type="string">
+  Your internal reference.
+</ParamField>
+
+<ParamField body="idempotencyKey" type="string">
+  Unique UUID per request — prevents duplicate orders on retry.
+</ParamField>
+
+<ParamField body="name" type="string">
+  Customer first name.
+</ParamField>
+
+<ParamField body="phone" type="string">
+  Customer phone number.
+</ParamField>
+
+<ParamField body="shortcode" type="string">
+  Telco shortcode.
+</ParamField>
+
+---
+
+## Response
+
+<ResponseExample>
+```json Response
+{
+  "id":        "ABCDEFG250101",
+  "reference": "ref1234",
+  "status":    0,
+  "message":   "Pending"
+}
+```
+</ResponseExample>
+
+<ResponseField name="id" type="string">
+  Transaction ID (absent on failure).
+</ResponseField>
+
+<ResponseField name="reference" type="string">
+  Your internal reference.
+</ResponseField>
+
+<ResponseField name="status" type="number">
+  See [Status Codes](/status).
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable status.
+</ResponseField>

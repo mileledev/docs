@@ -1,0 +1,108 @@
+---
+title: "Webhooks"
+description: "Receive real-time transaction status updates via HTTP webhooks."
+---
+
+Milele sends webhooks to your configured URL when a transaction reaches a final state. Set your webhook URL in [Settings](https://milele.co.ke/dashboard/settings).
+
+<Info>
+  Your webhook endpoint must return `HTTP 200` to acknowledge receipt. Milele will retry failed deliveries automatically.
+</Info>
+
+---
+
+## Delivery retries
+
+If your endpoint does not return a successful response (e.g. 2xx), or the request times out, Milele **retries** the delivery:
+
+- Retries follow a backoff schedule over a period of up to **72 hours**.
+- Return **2xx quickly** (e.g. within a few seconds) so Milele can mark the delivery as successful and avoid unnecessary retries.
+- Process the payload asynchronously if needed: acknowledge receipt with 2xx first, then handle the event in the background.
+- After **repeated failures** (e.g. many consecutive non-2xx or timeouts), Milele may stop retrying for that event. Ensure your endpoint is available and idempotent so duplicate deliveries are safe.
+
+---
+
+## Webhook payload
+
+<ResponseExample>
+```json Webhook body
+{
+  "id":        "ABCDEFG250101",
+  "reference": "ref1234",
+  "status":    20,
+  "message":   "Success",
+  "balance":   100,
+  "currency":  "KES",
+  "comm":      5
+}
+```
+</ResponseExample>
+
+<ResponseField name="id" type="string">
+  Milele transaction ID.
+</ResponseField>
+
+<ResponseField name="reference" type="string">
+  Your internal reference.
+</ResponseField>
+
+<ResponseField name="status" type="number">
+  Transactional status code. See [Status Codes](/status).
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable status description.
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  Currency code (e.g. `KES`).
+</ResponseField>
+
+<ResponseField name="balance" type="number">
+  Your account balance after the transaction.
+</ResponseField>
+
+<ResponseField name="comm" type="number">
+  Commission earned on the transaction (optional).
+</ResponseField>
+
+<ResponseField name="identity" type="object">
+  Identity verification result — only present on [Identity](/payments/identity) requests.
+</ResponseField>
+
+---
+
+## Verifying webhooks
+
+Webhooks are sent as HTTP `POST` requests to your configured URL. Your endpoint should return `HTTP 200` to acknowledge receipt. Milele retries failed deliveries automatically.
+
+### Signature verification
+
+When your business has a **signing secret** (the same secret you receive by email at API key approval, used to sign API requests), Milele includes an **`X-Webhook-Signature`** header on each webhook so you can verify the request came from Milele and was not tampered with.
+
+**Obtaining the secret**
+
+- The signing secret is emailed once when your API key is approved. It is the same secret used for [request signing](/payments/payouts#request-signing) and for verifying webhooks.
+- If you no longer have it, generate a new API key and complete approval to receive a new secret.
+
+**Verifying the signature**
+
+1. Read the raw request body (as received, before parsing JSON).
+2. Compute `expected = HMAC-SHA256(your_signing_secret, raw_body)` and encode the result as hex.
+3. Read the `X-Webhook-Signature` header. The value has the form `sha256=<hex>`.
+4. Compare the `<hex>` part with your `expected` using a **constant-time comparison** (e.g. not a simple string equality that can leak timing). If they match, the webhook is authentic.
+
+**Example (Node.js)**
+
+```js
+const crypto = require('crypto');
+
+function verifyWebhookSignature(rawBody, signatureHeader, signingSecret) {
+  if (!signatureHeader || !signatureHeader.startsWith('sha256=')) return false;
+  const expected = crypto.createHmac('sha256', signingSecret).update(rawBody).digest('hex');
+  const received = signatureHeader.slice(7); // after "sha256="
+  return crypto.timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(received, 'hex'));
+}
+```
+
+If your business does not yet have a signing secret in credentials (e.g. API key not approved with the new flow), webhooks are sent without this header. You can still verify by source IP if needed.

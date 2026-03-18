@@ -1,0 +1,86 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Milele",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg",
+    "href": "https://milele.co.ke"
+  },
+  "favicon": "/logo/favicon.svg",
+  "colors": {
+    "primary": "#D03030",
+    "light": "#FFC1AC",
+    "dark": "#BA1833",
+    "anchors": {
+      "from": "#D03030",
+      "to": "#BA1833"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Dashboard",
+      "url": "https://milele.co.ke/dashboard"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get API Keys",
+    "url": "https://milele.co.ke/dashboard/settings"
+  },
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "quickstart",
+        "prerequisites/authorization",
+        "prerequisites/idempotency",
+        "webhooks",
+        "status"
+      ]
+    },
+    {
+      "group": "Core",
+      "pages": [
+        "core/balance",
+        "core/status"
+      ]
+    },
+    {
+      "group": "Payments",
+      "pages": [
+        "payments/accept",
+        "payments/payouts",
+        "payments/payouts-status",
+        "payments/identity"
+      ]
+    },
+    {
+      "group": "Messaging",
+      "pages": [
+        "sms"
+      ]
+    },
+    {
+      "group": "Airtime",
+      "pages": [
+        "airtime/order",
+        "airtime/status"
+      ]
+    },
+    {
+      "group": "Bills",
+      "pages": [
+        "bills/bill",
+        "bills/order",
+        "bills/status"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "website": "https://milele.co.ke",
+    "twitter": "https://x.com/mileleairtime",
+    "linkedin": "https://www.linkedin.com/company/mileleairtime"
+  },
+  "feedback": {
+    "thumbsRating": true
+  }
+}
