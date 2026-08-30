@@ -43,8 +43,7 @@
       {
         "group": "Airtime",
         "pages": [
-          "airtime/order",
-          "airtime/status"
+          "airtime/order"
         ]
       },
       {
@@ -66,8 +65,7 @@
         "group": "Bills",
         "pages": [
           "bills/bill",
-          "bills/order",
-          "bills/status"
+          "bills/order"
         ]
       },
       {
