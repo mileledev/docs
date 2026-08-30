@@ -38,10 +38,16 @@
       ]
     },
     {
-      "group": "Core",
+      "group": "Airtime",
       "pages": [
-        "core/balance",
-        "core/status"
+        "airtime/order",
+        "airtime/status"
+      ]
+    },
+    {
+      "group": "Messaging",
+      "pages": [
+        "sms"
       ]
     },
     {
@@ -54,24 +60,18 @@
       ]
     },
     {
-      "group": "Messaging",
-      "pages": [
-        "sms"
-      ]
-    },
-    {
-      "group": "Airtime",
-      "pages": [
-        "airtime/order",
-        "airtime/status"
-      ]
-    },
-    {
       "group": "Bills",
       "pages": [
         "bills/bill",
         "bills/order",
         "bills/status"
+      ]
+    },
+    {
+      "group": "Core",
+      "pages": [
+        "core/balance",
+        "core/status"
       ]
     }
   ],
