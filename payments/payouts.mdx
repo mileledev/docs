@@ -14,9 +14,9 @@ Checks that your account has sufficient balance, then places an order. A [webhoo
 Pass the service name in the `service` field.
 
 | Service | Description |
-|---------|-------------|
+| --- | --- |
 | `mpesa` | Safaricom M-Pesa |
-| `airtel` | Airtel Money |
+| `airtelmoney` | Airtel Money |
 | `absa` | ABSA Bank |
 | `equity` | Equity Bank |
 | `kcb` | KCB Bank |
@@ -30,13 +30,13 @@ Pass the service name in the `service` field.
 Payout requests must be signed with HMAC-SHA256 using your [`signing_secret`](/prerequisites/authorization#signing-secret). Two additional headers are required on every call:
 
 | Header | Description |
-|--------|-------------|
+| --- | --- |
 | `X-Api-Timestamp` | Current Unix time in **seconds** (e.g. `1709200000`). Requests older than 5 minutes are rejected. |
 | `X-Api-Signature` | HMAC-SHA256 signature — see computation below. |
 
 ### Computing the signature
 
-```
+```text
 signature = HMAC-SHA256(signing_secret, timestamp + "POST" + "/v1/payouts" + SHA-256(body))
 ```
 
@@ -84,6 +84,7 @@ signature = hmac.new(
 ## Request
 
 <RequestExample>
+
 ```bash cURL
 curl -X POST https://api.milele.co.ke/v1/payouts \
   -H 'Content-Type: application/json' \
@@ -103,6 +104,7 @@ curl -X POST https://api.milele.co.ke/v1/payouts \
     "note":           "Paying John"
   }'
 ```
+
 </RequestExample>
 
 <ParamField body="service" type="string" required>
@@ -150,6 +152,7 @@ curl -X POST https://api.milele.co.ke/v1/payouts \
 ## Response
 
 <ResponseExample>
+
 ```json Success
 {
   "id":        "ABCDEFG250101",
@@ -158,6 +161,7 @@ curl -X POST https://api.milele.co.ke/v1/payouts \
   "message":   "Pending"
 }
 ```
+
 </ResponseExample>
 
 <ResponseField name="id" type="string">
@@ -181,7 +185,7 @@ curl -X POST https://api.milele.co.ke/v1/payouts \
 ## Error responses
 
 | HTTP | Reason |
-|------|--------|
+| --- | --- |
 | `400` | Missing required field (`service`, `account`, `amount`, `currency`) or invalid `X-Api-Timestamp` |
 | `403` | Missing HMAC headers, invalid signature, timestamp outside ±5 minute window, or IP not whitelisted |
 | `409` | Duplicate request — same `idempotencyKey` already processed. Use a new UUID to retry. |
