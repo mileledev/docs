@@ -187,5 +187,6 @@ curl -X POST https://api.milele.co.ke/v1/payouts \
 | `400` | Missing required field (`service`, `account`, `amount`, `currency`) or invalid `X-Api-Timestamp` |
 | `403` | Missing HMAC headers, invalid signature, timestamp outside ±5 minute window, or IP not whitelisted |
 | `409` | Duplicate request — same `idempotencyKey` already processed. Use a new UUID to retry. |
-| `402` | Insufficient balance |
-| `429` | Rate limit exceeded — too many requests from this IP |
+| `429` | Rate limit exceeded — too many requests from this IP, or payouts paused after repeated low-balance failures. Wait for `Retry-After`. |
+
+Insufficient balance is not an HTTP error: the response is `200` with `status` `7`.

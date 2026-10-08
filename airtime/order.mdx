@@ -66,6 +66,10 @@ curl -X POST https://api.milele.co.ke/v1/airtime \
 
 <ParamField body="idempotencyKey" type="string">
   Unique UUID per request — prevents duplicate orders on retry.
+
+  **Live-state replay.** Airtime is a fast-delivery flow: the initial POST returns immediately with `status: 0` ("Pending") while the top-up completes asynchronously within ~1–2 seconds. Retrying with the same `idempotencyKey` returns the **same transaction `id`** but with the **latest** transaction status — not the original "Pending" snapshot. Reusing the key with a different payload returns `409 idempotency_payload_mismatch`.
+
+  This is a deliberate divergence from byte-identical Stripe-style replay and is scoped to airtime and bill-payment services only. Payment and payout endpoints replay the original response verbatim.
 </ParamField>
 
 <ParamField body="name" type="string">
@@ -77,7 +81,7 @@ curl -X POST https://api.milele.co.ke/v1/airtime \
 </ParamField>
 
 <ParamField body="shortcode" type="string">
-  Telco shortcode.
+  **Your own** M-Pesa shortcode (paybill or till) — not a telco code. Selects which of your wallets funds and is billed for the order when your business has more than one. Omit it and your default wallet is used. The telco is chosen by [`service`](#services), never by this field.
 </ParamField>
 
 ---
@@ -110,3 +114,14 @@ curl -X POST https://api.milele.co.ke/v1/airtime \
 <ResponseField name="message" type="string">
   Human-readable status.
 </ResponseField>
+
+---
+
+## Synchronous replies
+
+If your system needs the outcome in the same call, ask us to turn on synchronous replies for your account. The `POST` then waits for the final status, usually 1–2 seconds, and replies with it instead of `status: 0`.
+
+- The wait is set per account, up to 30 seconds.
+- If the order is not final by then, the reply carries its latest status, which is still pending. It is never reported as failed. Settle it with the [webhook](/webhooks) or by [retrieving the airtime order](/airtime/status).
+- A held order (`202`, delivery paused) replies at once.
+- Under heavy load the reply can come back at once with a pending status. Treat it like any pending reply.

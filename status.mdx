@@ -19,12 +19,13 @@ Use them together to decide whether to retry, show an error, or mark a payment a
 | `200` | OK |
 | `400` | Bad Request |
 | `401` | Unauthorized |
-| `402` | Request Failed (e.g. insufficient balance) |
 | `403` | Forbidden |
 | `404` | Not Found |
 | `409` | Conflict (e.g. duplicate request) |
-| `429` | Too Many Requests |
+| `429` | Too Many Requests — rate limit, or orders paused after repeated low-balance failures (`reason`: `INSUFFICIENT_BALANCE_BACKOFF`). Wait for `Retry-After`. |
 | `500` `502` `503` `504` | Server Error — temporary, safe to retry with the same idempotency key |
+
+A low balance is not an HTTP error. The request returns `200` and the body's `status` is `7` (Insufficient funds).
 
 ---
 
@@ -46,6 +47,11 @@ Returned in the `status` field of the response body on **payments, payouts, airt
 | `3` | **Submitted** — request forwarded to provider, awaiting response |
 | `31` | **Processing** — provider is still processing the request |
 | `100` `101` | **Retrying** — Milele is automatically retrying with the provider |
+| `202` | **Held** — paid, but delivery is paused; it is sent automatically when delivery resumes, or reversed (`8`) if it cannot resume |
+| `203` | **Delivering** — a held transaction is being sent now |
+| `204` | **Refunding** — a held transaction is being reversed; it ends as `8` |
+
+Treat any code not listed on this page as pending: keep checking or wait for the webhook. Never resend it with a new idempotency key.
 
 ### Failed
 
