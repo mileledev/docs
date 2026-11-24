@@ -100,5 +100,7 @@ Milele sends **webhooks** to your server whenever a transaction changes state.
 | Status | Meaning |
 |--------|---------|
 | `20` | Success — payment complete |
-| `0`, `3`, `31`, `100`, `101` | Still pending — wait for webhook |
-| Any other | Failed — review and handle |
+| `0`, `3`, `31`, `100`, `101`, `202`, `203`, `204` | Still pending — wait for webhook |
+| Listed as [Failed](/status#failed) | Failed — review and handle |
+
+Only statuses listed as Failed in the [Status Codes](/status) reference are failures. For pending or unknown statuses, [check the existing transaction](/core/status) or wait for its webhook. Don't resend with a new idempotency key.

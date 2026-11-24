@@ -74,7 +74,7 @@ signature = hmac.new(
 ```
 
 <Tip>
-  Pass a unique UUID in the `idempotencyKey` body field. The server uses it to deduplicate requests — a retry with the same key returns the original result instead of sending a duplicate payout.
+  Pass a unique UUID in the `idempotencyKey` body field, one per payout. The server uses it to deduplicate requests — a retry with the same key returns the original result instead of sending a duplicate payout. This endpoint reads the key from the body only, not from the `Idempotency-Key` header. See [Retry a payout safely](#retry-a-payout-safely).
 </Tip>
 
 ---
@@ -126,7 +126,7 @@ curl -X POST https://api.milele.co.ke/v1/payouts \
 </ParamField>
 
 <ParamField body="idempotencyKey" type="string">
-  Unique UUID per request — prevents duplicate payouts on retry.
+  Unique UUID per payout. Send the same value on every retry of that payout — this prevents duplicate payouts. Send it in the body: this endpoint does not read the `Idempotency-Key` header.
 </ParamField>
 
 <ParamField body="name" type="string">
@@ -186,7 +186,19 @@ curl -X POST https://api.milele.co.ke/v1/payouts \
 | --- | --- |
 | `400` | Missing required field (`service`, `account`, `amount`, `currency`) or invalid `X-Api-Timestamp` |
 | `403` | Missing HMAC headers, invalid signature, timestamp outside ±5 minute window, or IP not whitelisted |
-| `409` | Duplicate request — same `idempotencyKey` already processed. Use a new UUID to retry. |
+| `409` | Duplicate request — this exact signed request (same `X-Api-Timestamp` and body) was already received, or the same `idempotencyKey` was sent with a different body. Do not generate a new key to retry the same payout. Confirm the original payout's status before submitting another. |
 | `429` | Rate limit exceeded — too many requests from this IP, or payouts paused after repeated low-balance failures. Wait for `Retry-After`. |
 
 Insufficient balance is not an HTTP error: the response is `200` with `status` `7`.
+
+---
+
+## Retry a payout safely
+
+If a request times out or you lose the response, the payout may already exist. Find it before you pay again:
+
+1. **Within 24 hours, send the same request again.** Keep the same body, including the same `idempotencyKey`, and sign it again with a new `X-Api-Timestamp`. If the first request reached Milele, you get that payout's `id` back and it is not paid twice. If it did not, this request creates the payout.
+2. **Check that payout's status** with [`GET /v1/status/{id}`](/core/status), or wait for its [webhook](/webhooks). The webhook carries the payout's `id` and your `reference`.
+3. **Do not use `reference` to find it if your references repeat.** A lookup by reference returns the most recent payout with that reference, which may not be the one you lost. Look it up by `id`.
+
+After 24 hours the key expires, and a request with it is paid as a new payout. If you still cannot confirm the original, check your webhook records or contact support with the time, account and amount. Do not submit the payout again until you know its status.

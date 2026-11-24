@@ -65,7 +65,7 @@ curl -X POST https://api.milele.co.ke/v1/airtime \
 </ParamField>
 
 <ParamField body="idempotencyKey" type="string">
-  Unique UUID per request — prevents duplicate orders on retry.
+  Unique UUID per order. Send the same value on every retry of that order — this prevents duplicate orders.
 
   **Live-state replay.** Airtime is a fast-delivery flow: the initial POST returns immediately with `status: 0` ("Pending") while the top-up completes asynchronously within ~1–2 seconds. Retrying with the same `idempotencyKey` returns the **same transaction `id`** but with the **latest** transaction status — not the original "Pending" snapshot. Reusing the key with a different payload returns `409 idempotency_payload_mismatch`.
 
