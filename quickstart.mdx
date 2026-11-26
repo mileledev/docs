@@ -14,7 +14,7 @@ description: "Get up and running with Milele in a few minutes."
     Disburse funds to mobile money, bank, or stablecoin wallets
   </Card>
   <Card title="Webhooks" icon="webhook" href="/webhooks">
-    Receive real-time transaction status updates on your server
+    Receive transaction results on your server
   </Card>
 </CardGroup>
 
@@ -92,15 +92,14 @@ Follow the [Accept a Payment](/payments/accept) guide for a full walkthrough.
 
 ## 5. Handle webhooks and errors
 
-Milele sends **webhooks** to your server whenever a transaction changes state.
+Use the [webhook](/webhooks) to learn the transaction's final status. While the status is pending or unknown, [check the existing transaction by ID](/core/status).
 
-- Implement a webhook endpoint as described in [Webhooks](/webhooks).
-- Use the `status` field from [Status Codes](/status) to decide how to update your system:
+Use the `status` field to decide how to update your system.
 
 | Status | Meaning |
 |--------|---------|
 | `20` | Success — payment complete |
-| `0`, `3`, `31`, `100`, `101`, `202`, `203`, `204` | Still pending — wait for webhook |
+| `0`, `3`, `31`, `100`, `101`, `202`, `203`, `204` | Pending |
 | Listed as [Failed](/status#failed) | Failed — review and handle |
 
-Only statuses listed as Failed in the [Status Codes](/status) reference are failures. For pending or unknown statuses, [check the existing transaction](/core/status) or wait for its webhook. Don't resend with a new idempotency key.
+Only statuses listed as [Failed](/status#failed) are failures. Never resend a pending or unknown transaction with a new idempotency key.
