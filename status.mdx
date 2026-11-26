@@ -23,7 +23,7 @@ Use them together to decide whether to retry, show an error, or mark a payment a
 | `404` | Not Found |
 | `409` | Conflict (e.g. duplicate request) |
 | `429` | Too Many Requests — rate limit, or orders paused after repeated low-balance failures (`reason`: `INSUFFICIENT_BALANCE_BACKOFF`). Wait for `Retry-After`. |
-| `500` `502` `503` `504` | Server Error — temporary, safe to retry with the same idempotency key |
+| `500` `502` `503` `504` | Server error. The request may have reached the server. See [Handling statuses](#handling-statuses) before retrying. |
 
 A low balance is not an HTTP error. The request returns `200` and the body's `status` is `7` (Insufficient funds).
 
@@ -75,14 +75,13 @@ Treat any code not listed on this page as pending: keep checking or wait for the
 
 ## Handling statuses
 
+If a payout request times out or you lose the response, the payout may already exist. Within 24 hours of the original request, retry only with the unchanged body, including the same `idempotencyKey`. Sign it again with a fresh `X-Api-Timestamp`.
+
+Once 24 hours have passed, do not retry a payout whose outcome is unknown. [Check the original payout by transaction ID](/core/status), check your [webhook records](/webhooks), or contact support.
+
 <AccordionGroup>
-  <Accordion title="Safe to retry">
-    You can safely retry **with the same idempotency key** when:
-
-    - HTTP status is `5xx`, or
-    - Transactional `status` is `6` (Timeout) or an Error code (`13`, `15`, `16`, `24`).
-
-    Milele will deduplicate retries and ensure funds are not moved twice.
+  <Accordion title="Server or provider errors">
+    For an endpoint that supports [idempotency](/prerequisites/idempotency), reuse the original body and key if you retry after HTTP `5xx` or a provider timeout or error (transaction status `6`, `13`, `15`, `16`, or `24`). For payouts, the 24-hour limit above applies.
   </Accordion>
 
   <Accordion title="Do not retry automatically">
@@ -91,9 +90,7 @@ Treat any code not listed on this page as pending: keep checking or wait for the
     - HTTP status is `4xx` (`400`, `401`, `403`, `409`), or
     - Transactional status is `1`, `2`, `5`, `7`, `10`, `11`, `17`, `18`, `19`, or `120`.
 
-    In these cases, show the error to the user or correct the request before retrying.
-
-    After a `409`, never resend with a new idempotency key: the original may already have gone through. Confirm its status first, as in [Retry a payout safely](/payments/payouts#retry-a-payout-safely).
+    Show the error to the user. After HTTP `409`, confirm the original payout's status. Never use a new key to retry the same payout. See [Retry a payout safely](/payments/payouts#retry-a-payout-safely).
   </Accordion>
 </AccordionGroup>
 
